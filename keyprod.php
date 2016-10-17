@@ -18,6 +18,8 @@ if(!class_exists('Keyprod')) {
         {
             add_action( 'admin_menu', array($this,'add_menu' ));
             add_action( 'current_screen', array($this, 'init_page_scripts' ));
+            add_action( 'wp_ajax_nopriv_launch_test', array($this, 'launch_test' ));
+            add_action( 'wp_ajax_launch_test', array($this, 'launch_test' ));
         }
 
         /*
@@ -36,10 +38,11 @@ if(!class_exists('Keyprod')) {
                 wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
             }
             echo '<div class="wrap">';
-            echo '<h1>Welcom to Keyprod options</h1>';
-            echo '<div id="keyprod-app">{{ message }}</div>';
-            echo '<p>Here you can start your monitoring</p>';
-            echo '<button type="button" class="btn btn-outline-primary">Start</button>';
+             echo '<h1>Welcom to Keyprod options</h1>';
+                echo '<div id="keyprod-app">';
+                    echo '<p v-if="!launch">Here you can start your monitoring</p>';
+                    echo '<button v-on:click="start" v-if="!launch" type="button" class="btn btn-outline-primary">Start</button>';
+                echo '</div>';
             echo '</div>';
         }
 
@@ -52,16 +55,22 @@ if(!class_exists('Keyprod')) {
                 wp_enqueue_script('keyprod_admin_js_tether', 'https://www.atlasestateagents.co.uk/javascript/tether.min.js', false, '1.0.0', false);
                 wp_enqueue_script('keyprod_admin_js_bootstrap_hack', 'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.4/js/bootstrap.min.js', false, '1.0.0', false);
                 wp_enqueue_script('keyprod_admin_vuejs', plugins_url('keyprod/modules/vue/dist/vue.js'));
+                wp_register_script('keyprod_index_vuejs', plugins_url('keyprod/app/index.js'), ['keyprod_admin_vuejs']);
+                wp_localize_script( 'keyprod_index_vuejs', 'keyprod_ajax_url', array(
+                    'ajax_url' => admin_url( 'admin-ajax.php' )
+                ));
+                wp_enqueue_script( 'keyprod_index_vuejs' );
             }
         }
 
-
+        function launch_test() {
+            echo 'test';
+            wp_die();
+        }
 
 
     }
 
     $keyprod = new Keyprod();
-
-
 
 }
