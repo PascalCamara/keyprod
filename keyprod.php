@@ -41,7 +41,8 @@ if(!class_exists('Keyprod')) {
                 echo '<h1>Welcom to Keyprod options</h1>';
 
                 echo '<div id="keyprod-app">';
-                    echo "<fakeloader v-if='launch'></fakeloader>";
+                    echo "<fake-loader v-if='loading'></fake-loader>";
+                    echo '<checking-array v-if="displayChecking" v-bind:rapports="rapports"></checking-array>';
                     echo '<p v-if="!launch">Here you can start your monitoring</p>';
                     echo '<button v-on:click="start" v-if="!launch" type="button" class="btn btn-outline-primary">Start</button>';
                 echo '</div>';
@@ -68,13 +69,10 @@ if(!class_exists('Keyprod')) {
         }
 
         function launch_test() {
-            $a = file_get_contents('http://api.wordpress.org/core/version-check/1.7/');
-            $a = json_decode($a);
-            echo $a->offers[0]->current;
-            //echo $a;
-            //echo json_encode(get_bloginfo('version'));
+            require_once 'Check.php';
+            $checking = new Check();
+            echo $checking->getJsonRapport();
             wp_die();
-
         }
 
 
