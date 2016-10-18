@@ -38,8 +38,10 @@ if(!class_exists('Keyprod')) {
                 wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
             }
             echo '<div class="wrap">';
-             echo '<h1>Welcom to Keyprod options</h1>';
+                echo '<h1>Welcom to Keyprod options</h1>';
+
                 echo '<div id="keyprod-app">';
+                    echo "<fakeloader v-if='launch'></fakeloader>";
                     echo '<p v-if="!launch">Here you can start your monitoring</p>';
                     echo '<button v-on:click="start" v-if="!launch" type="button" class="btn btn-outline-primary">Start</button>';
                 echo '</div>';
@@ -52,8 +54,10 @@ if(!class_exists('Keyprod')) {
         function init_page_scripts() {
             if (get_current_screen()->base === "settings_page_keyprod_page_options") {
                 wp_enqueue_style('keyprod_admin_css_bootstrap', 'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.4/css/bootstrap.min.css', false, '1.0.0', 'all');
+                wp_enqueue_style('keyprod_admin_css_fakeloader', plugins_url('keyprod/modules/fakeLoader/fakeLoader.css'), false, '1.0.0', 'all');
                 wp_enqueue_script('keyprod_admin_js_tether', 'https://www.atlasestateagents.co.uk/javascript/tether.min.js', false, '1.0.0', false);
                 wp_enqueue_script('keyprod_admin_js_bootstrap_hack', 'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.4/js/bootstrap.min.js', false, '1.0.0', false);
+                wp_enqueue_script('keyprod_admin_js_fakeloader', plugins_url('keyprod/modules/fakeLoader/fakeLoader.js'), false, '1.0.0', false);
                 wp_enqueue_script('keyprod_admin_vuejs', plugins_url('keyprod/modules/vue/dist/vue.js'));
                 wp_register_script('keyprod_index_vuejs', plugins_url('keyprod/app/index.js'), ['keyprod_admin_vuejs']);
                 wp_localize_script( 'keyprod_index_vuejs', 'keyprod_ajax_url', array(
