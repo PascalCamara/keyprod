@@ -64,8 +64,13 @@ if(!class_exists('Keyprod')) {
         }
 
         function launch_test() {
-            echo 'test';
+            $a = file_get_contents('http://api.wordpress.org/core/version-check/1.7/');
+            $a = json_decode($a);
+            echo $a->offers[0]->current;
+            //echo $a;
+            //echo json_encode(get_bloginfo('version'));
             wp_die();
+
         }
 
 
