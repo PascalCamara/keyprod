@@ -57,17 +57,50 @@ class Check {
 //            $this->addRapport(3,$this->checkDirectoryPermissions()[$i] );
 
         // checking if const wp FS_CHMOD_DIR exist
-        $this->addRapport(2, [defined(FS_CHMOD_DIR)]);
-//        if (!defined(FS_CHMOD_DIR)) {
-//            $this->addRapport(2, [FS_CHMOD_DIR]);
-//        } else {
-//            $this->addRapport(3, [
-//                "Vous n'avez pas défini la constante FS_CHMOD_DIR",
-//                "Vous pouvez le définir dans le fichier wp-config.php en ajoutant :",
-//                "define('FS_CHMOD_DIR', 0755);"
-//            ]);
-//        };
+        if (defined("FS_CHMOD_DIR")) {
+            if (FS_CHMOD_DIR === 493)
+                $this->addRapport(1, ["Votre constante FS_CHMOD_DIR est bien définie"]);
+            elseif (FS_CHMOD_DIR ===755)
+                $this->addRapport(2, [
+                    "Votre constante est bien définie",
+                    "Cependant la valeur n'est pas bonne" ,
+                    "Essayer plutôt d'écrire '0755' au lieu de '755'"
+                ]);
+            else
+                $this->addRapport(2, [
+                    "Votre constante FS_CHMOD_DIR est bien définie cependant la valeur n'est pas bonne",
+                    "il est conseiller de mettre '0755'"
+                ]);
+        } else {
+            $this->addRapport(3, [
+                "Vous n'avez pas défini la constante FS_CHMOD_DIR",
+                "Vous pouvez le définir dans le fichier wp-config.php en ajoutant :",
+                "define('FS_CHMOD_DIR', 0755);"
+            ]);
+        };
 
+        // checking if const wp FS_CHMOD_DIR exist
+        if (defined("FS_CHMOD_FILE")) {
+            if (FS_CHMOD_FILE ===  420)
+                $this->addRapport(1, ["Votre constante FS_CHMOD_FILE est bien définie"]);
+            elseif (FS_CHMOD_FILE ===644)
+                $this->addRapport(2, [
+                    "Votre constante est bien définie",
+                    "Cependant la valeur n'est pas bonne" ,
+                    "Essayer plutôt d'écrire '0644' au lieu de '644'"
+                ]);
+            else
+                $this->addRapport(2, [
+                    "Votre constante FS_CHMOD_FILE est bien définie cependant la valeur n'est pas bonne",
+                    "il est conseiller de mettre '0644'"
+                ]);
+        } else {
+            $this->addRapport(3, [
+                "Vous n'avez pas défini la constante FS_CHMOD_FILE",
+                "Vous pouvez le définir dans le fichier wp-config.php en ajoutant :",
+                "define('FS_CHMOD_FILE', 0644);"
+            ]);
+        };
     }
 
     /**
