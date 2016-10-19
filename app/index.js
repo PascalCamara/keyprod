@@ -15,7 +15,7 @@ $(document).ready(function() {
     };
 
     var checkingArray = {
-        props : ['rapports'],
+        props : ['rapports', 'trello'],
         data : function() {
             return {
                 stateClass : {
@@ -40,7 +40,7 @@ $(document).ready(function() {
                 +'<th>#</th>'
                 +'<th>State</th>'
                 +'<th>Description</th>'
-                +'<th>Trello</th>'
+                +'<th v-if="trello">Trello</th>'
             +'</tr>'
         +'</thead>'
         +'<tbody>'
@@ -48,7 +48,7 @@ $(document).ready(function() {
                 +'<th scope="row">{{ rapport.id }}</th>'
                 +'<td>{{ stateClass[rapport.state].text }}</td>'
                 +'<td><span v-for="desc in rapport.description" style="display: block;">{{ desc }}</span></td>'
-                + '<td>'
+                + '<td v-if="trello">'
                     +'<div class="checkbox" v-if="rapport.state != 1">'
                     +'<input type="checkbox" value="">'
                     +'</div>'
@@ -68,7 +68,8 @@ $(document).ready(function() {
             'launch' : false,
             'loading': false,
             'rapports' : {},
-            'displayChecking' : false
+            'displayChecking' : false,
+            'trello' : false
         },
         methods : {
             start: function () {

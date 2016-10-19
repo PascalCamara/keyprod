@@ -11,6 +11,7 @@ Text Domain: keyprod
 if(!class_exists('Keyprod')) {
     class Keyprod {
 
+        private $keyprod_tables;
         /**
          * Keyprod constructor.
          */
@@ -20,6 +21,12 @@ if(!class_exists('Keyprod')) {
             add_action( 'current_screen', array($this, 'init_page_scripts' ));
             add_action( 'wp_ajax_nopriv_launch_test', array($this, 'launch_test' ));
             add_action( 'wp_ajax_launch_test', array($this, 'launch_test' ));
+            require 'Rapports.php';
+
+
+
+//            register_activation_hook( __FILE__, array($this, 'tables_install' ));
+            $this->keyprod_tables = new Rapports(__FILE__);
         }
 
         /*
@@ -37,14 +44,16 @@ if(!class_exists('Keyprod')) {
             if ( !current_user_can( 'manage_options' ) )  {
                 wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
             }
-            echo '<div class="wrap">';
-                echo '<h1>Welcom to Keyprod options</h1>';
-
-                echo '<div id="keyprod-app">';
-                    echo "<fake-loader v-if='loading'></fake-loader>";
-                    echo '<checking-array v-if="displayChecking" :rapports="rapports"></checking-array>';
-                    echo '<p v-if="!launch">Here you can start your monitoring</p>';
-                    echo '<button v-on:click="start" v-if="!launch" type="button" class="btn btn-outline-primary">Start</button>';
+            echo '<div class="container">';
+                echo '<div class="wrap">';
+                    echo '<h1>Welcom to Keyprod options</h1>';
+                    echo '<div id="keyprod-app">';
+                        echo "<fake-loader v-if='loading'></fake-loader>";
+                        echo '<checking-array v-if="displayChecking" :rapports="rapports" :trello="trello"></checking-array>';
+                        echo '<p v-if="!launch">Here you can start your monitoring</p>';
+                        echo '<button v-on:click="start" v-if="!launch" type="button" class="btn btn-outline-primary">Start</button>';
+                        echo '<button v-on:click="trello" v-if="!launch" type="button" class="btn btn-outline-secondary" style="margin-left: 20px">Configure Trello</button>';
+                    echo '</div>';
                 echo '</div>';
             echo '</div>';
         }
@@ -71,7 +80,9 @@ if(!class_exists('Keyprod')) {
         function launch_test() {
             require_once 'Check.php';
             $checking = new Check();
-            echo $checking->getJsonRapport();
+            $data = $checking->getJsonRapport();
+            echo $data;
+            $this->keyprod_tables->setRapport($data);
             wp_die();
         }
 
