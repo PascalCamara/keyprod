@@ -16,6 +16,13 @@ $(document).ready(function() {
 
     var checkingArray = {
         props : ['rapports'],
+        data : function() {
+            return {
+                stateClass : {
+                    1 : ''
+                }
+            }
+        },
         template : '<table class="table">'
         +'<thead>'
             +'<tr>'
@@ -26,7 +33,7 @@ $(document).ready(function() {
             +'</tr>'
         +'</thead>'
         +'<tbody>'
-            +'<tr :for="rapport in rapports">'
+            +'<tr v-for="rapport in rapports">'
                 +'<th scope="row">{{ rapport.id }}</th>'
                 +'<td>{{ rapport.state}}</td>'
                 +'<td>{{ rapport.description}}</td>'
@@ -49,26 +56,26 @@ $(document).ready(function() {
         data: {
             'launch' : false,
             'loading': false,
-            'rapports' : false,
+            'rapports' : {},
             'displayChecking' : false
         },
         methods : {
             start: function () {
                 var self = this;
                 self.launch = true;
-                // self.loading = true;
+                self.loading = true;
 
                 var data = {};
                 data.action = 'launch_test';
 
                 self.rapports = [{'id' : 1 , 'state': 1, 'description' : "blabla"}];
-                self.displayChecking = true;
-                // $.post(keyprod_ajax_url.ajax_url, data, function (response) {
-                //     self.loading = false;
-                //     self.rapports = JSON.parse(response);
-                //     self.displayChecking = true;
-                //     console.log(self.rapports);
-                // })
+                // self.displayChecking = true;
+                $.post(keyprod_ajax_url.ajax_url, data, function (response) {
+                    self.loading = false;
+                    self.rapports = JSON.parse(response);
+                    self.displayChecking = true;
+                    console.log(self.rapports);
+                });
             },
             progress: function () {
 

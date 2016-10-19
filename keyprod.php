@@ -42,7 +42,7 @@ if(!class_exists('Keyprod')) {
 
                 echo '<div id="keyprod-app">';
                     echo "<fake-loader v-if='loading'></fake-loader>";
-                    echo '<checking-array v-if="displayChecking" v-bind:rapports="rapports"></checking-array>';
+                    echo '<checking-array v-if="displayChecking" :rapports="rapports"></checking-array>';
                     echo '<p v-if="!launch">Here you can start your monitoring</p>';
                     echo '<button v-on:click="start" v-if="!launch" type="button" class="btn btn-outline-primary">Start</button>';
                 echo '</div>';
