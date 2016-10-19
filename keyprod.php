@@ -19,13 +19,14 @@ if(!class_exists('Keyprod')) {
         {
             add_action( 'admin_menu', array($this,'add_menu' ));
             add_action( 'current_screen', array($this, 'init_page_scripts' ));
+
             add_action( 'wp_ajax_nopriv_launch_test', array($this, 'launch_test' ));
             add_action( 'wp_ajax_launch_test', array($this, 'launch_test' ));
+
+            add_action( 'wp_ajax_nopriv_launched_test', array($this, 'launched_test' ));
+            add_action( 'wp_ajax_launched_test', array($this, 'launched_test' ));
+
             require 'Rapports.php';
-
-
-
-//            register_activation_hook( __FILE__, array($this, 'tables_install' ));
             $this->keyprod_tables = new Rapports(__FILE__);
         }
 
@@ -48,11 +49,16 @@ if(!class_exists('Keyprod')) {
                 echo '<div class="wrap">';
                     echo '<h1>Welcom to Keyprod options</h1>';
                     echo '<div id="keyprod-app">';
+                        echo "<div v-if='hasHistoric' class='list-group'><a href='#' class='list-group-item list-group-item-action' style='margin-top:20px;' v-for='historic in hasHistoric' @click='displayHistoric(historic.id)'>Rapport du <b>{{ historic.date }}</b> <span class=\"tag tag-default tag-pill pull-xs-right\">{{historic.rapports.length}}</span></a></div>";
                         echo "<fake-loader v-if='loading'></fake-loader>";
-                        echo '<checking-array v-if="displayChecking" :rapports="rapports" :trello="trello"></checking-array>';
+                        echo '<checking-array v-if="displayChecking" :rapports="rapports" :trello="trello" style="margin-top: 20px;"></checking-array>';
                         echo '<p v-if="!launch">Here you can start your monitoring</p>';
                         echo '<button v-on:click="start" v-if="!launch" type="button" class="btn btn-outline-primary">Start</button>';
-                        echo '<button v-on:click="trello" v-if="!launch" type="button" class="btn btn-outline-secondary" style="margin-left: 20px">Configure Trello</button>';
+                        echo '<button v-on:click="historic" v-if="!launch" type="button" class="btn btn-outline-secondary" style="margin-left: 20px">Historic</button>';
+                        echo '<button  v-if="!launch" type="button" class="btn btn-outline-secondary" style="margin-left: 20px">Configure Trello</button>';
+                        echo "<div class='wrap'>";
+                            echo "<button  @click='backTo' v-if='action' type=\"button\" class=\"btn btn-outline-secondary\" style=\"margin-top: 20px\">Back</button>";
+                        echo "</div>";
                     echo '</div>';
                 echo '</div>';
             echo '</div>';
@@ -77,12 +83,34 @@ if(!class_exists('Keyprod')) {
             }
         }
 
+        /**
+         *  AJAX start a rapport test
+         */
         function launch_test() {
             require_once 'Check.php';
             $checking = new Check();
             $data = $checking->getJsonRapport();
             echo $data;
             $this->keyprod_tables->setRapport($data);
+            wp_die();
+        }
+
+        /**
+         * AJAX get a rapport tests
+         */
+        function launched_test() {
+            $rapports = $this->keyprod_tables->getRapport();
+            $datas = array();
+            if (!empty($rapports)){
+                for ($i = 0; $i < count($rapports); $i++){
+                    array_push(  $datas, [
+                        "id" => $rapports[$i]->id,
+                        "date" => date("j / n / Y", strtotime($rapports[$i]->time)),
+                        "rapports" => json_decode($rapports[$i]->rapport)
+                    ]);
+                }
+            }
+            echo json_encode($datas);
             wp_die();
         }
 

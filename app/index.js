@@ -67,30 +67,61 @@ $(document).ready(function() {
         data: {
             'launch' : false,
             'loading': false,
-            'rapports' : {},
+            'hasHistoric' : false,
             'displayChecking' : false,
+            'action' : false,
+            'rapports' : {},
             'trello' : false
         },
         methods : {
             start: function () {
                 var self = this;
+
                 self.launch = true;
                 self.loading = true;
 
                 var data = {};
                 data.action = 'launch_test';
 
-                self.rapports = [{'id' : 1 , 'state': 1, 'description' : "blabla"}];
-                // self.displayChecking = true;
                 $.post(keyprod_ajax_url.ajax_url, data, function (response) {
                     self.loading = false;
                     self.rapports = JSON.parse(response);
                     self.displayChecking = true;
                     console.log(self.rapports);
+
                 });
             },
-            progress: function () {
+            historic: function () {
+                var self = this;
+                self.action = "historic";
 
+                self.launch = true;
+                self.loading = true;
+
+                var data = {};
+                data.action = 'launched_test';
+
+                $.post(keyprod_ajax_url.ajax_url, data, function (response) {
+                    self.loading = false;
+                    self.hasHistoric= JSON.parse(response);
+                    console.log(self.hasHistoric);
+                });
+
+            },
+            displayHistoric : function (id_historic) {
+                var self = this;
+                self.action = "displayHistoric";
+                self.rapports = self.hasHistoric[parseInt(id_historic, 10)].rapports;
+                self.hasHistoric = false;
+                self.displayChecking = true;
+            },
+            backTo : function() {
+                var self = this;
+                self.action =false;
+                self.launch = false;
+                self.loading = false;
+                self.hasHistoric = false;
+                self.displayChecking = false;
             }
         }
     });
