@@ -17,6 +17,9 @@ class Check {
         $this->doTest();
     }
 
+    /**
+     *  Define system variables
+     */
     public function init()
     {
         // WP current version
@@ -25,29 +28,41 @@ class Check {
         $this->lastWordpressVersion = get_site_transient("update_core");
     }
 
+    /**
+     *  addRapport push an array
+     * @param $id number id incremental test
+     * @param $state number state
+     * @param $message string message
+     */
+    private function addRapport($id, $state, $message) {
+        array_push($this->rapport, array(
+            'id' => ++$id,
+            'state' => $state,
+            'description' => $message
+        ));
+    }
 
     private function doTest()
     {
         $nbTest = 0;
+
         // wordpress update
         if($this->haskWordpressUpdate()) {
-            array_push($this->rapport, array(
-                "id" => $nbTest + 1,
-                "state" => 2,
-                "description" => "Une mise a jour Wordpress (". $this->lastWordpressVersion->updates[0]->current.") est disponible"
-            ));
+            $message = "Une mise a jour (" .$this->lastWordpressVersion->updates[0]->current.") Wordpress";
+            $this->addRapport($nbTest, 2, $message);
         } else {
-            array_push($this->rapport, array(
-                "id" => $nbTest + 1,
-                "state" => 1,
-                "description" => "Votre Wordpress est à jour"
-            ));
+            $this->addRapport($nbTest, 1, "Votre Wordpress est à jour");
         };
+
+        //
     }
 
+    /**
+     * @return bool check if has wordpress update
+     */
     public function haskWordpressUpdate()
     {
-        return intval(str_replace('.', '', $this->currentWordpressVersion)) >= intval(str_replace('.', '', $this->lastWordpressVersion->updates[0]->current));
+        return intval(str_replace('.', '', $this->currentWordpressVersion)) < intval(str_replace('.', '', $this->lastWordpressVersion->updates[0]->current));
     }
 
 
