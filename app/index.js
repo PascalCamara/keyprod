@@ -47,7 +47,7 @@ $(document).ready(function() {
             +'<tr v-for="rapport in rapports" v-bind:class="stateClass[rapport.state].css">'
                 +'<th scope="row">{{ rapport.id }}</th>'
                 +'<td>{{ stateClass[rapport.state].text }}</td>'
-                +'<td>{{ rapport.description}}</td>'
+                +'<td><span v-for="desc in rapport.description" style="display: block;">{{ desc }}</span></td>'
                 + '<td>'
                     +'<div class="checkbox" v-if="rapport.state != 1">'
                     +'<input type="checkbox" value="">'
