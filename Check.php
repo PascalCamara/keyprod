@@ -47,7 +47,7 @@ class Check {
 
     public function haskWordpressUpdate()
     {
-        return intval(str_replace('.', '', $this->currentWordpressVersion)) < intval(str_replace('.', '', $this->lastWordpressVersion->updates[0]->current));
+        return intval(str_replace('.', '', $this->currentWordpressVersion)) >= intval(str_replace('.', '', $this->lastWordpressVersion->updates[0]->current));
     }
 
 

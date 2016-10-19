@@ -19,11 +19,22 @@ $(document).ready(function() {
         data : function() {
             return {
                 stateClass : {
-                    1 : ''
+                    1 : {
+                        'css' : 'bg-success',
+                        'text' : 'Success'
+                    },
+                    2 : {
+                        'css' : 'bg-warning',
+                        'text' : 'Warning'
+                    },
+                    3 : {
+                        'css' : 'bg-danger',
+                        'text' : 'Danger'
+                    }
                 }
             }
         },
-        template : '<table class="table">'
+        template : '<table class="table table-sm table-inverse">'
         +'<thead>'
             +'<tr>'
                 +'<th>#</th>'
@@ -33,12 +44,12 @@ $(document).ready(function() {
             +'</tr>'
         +'</thead>'
         +'<tbody>'
-            +'<tr v-for="rapport in rapports">'
+            +'<tr v-for="rapport in rapports" v-bind:class="stateClass[rapport.state].css">'
                 +'<th scope="row">{{ rapport.id }}</th>'
-                +'<td>{{ rapport.state}}</td>'
+                +'<td>{{ stateClass[rapport.state].text }}</td>'
                 +'<td>{{ rapport.description}}</td>'
                 + '<td>'
-                    +'<div class="checkbox">'
+                    +'<div class="checkbox" v-if="rapport.state != 1">'
                     +'<input type="checkbox" value="">'
                     +'</div>'
                 +'</td>'
