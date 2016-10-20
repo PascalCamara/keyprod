@@ -12,11 +12,16 @@ if(!class_exists('Keyprod')) {
     class Keyprod {
 
         private $keyprod_tables;
+        private $trello_api_token;
         /**
          * Keyprod constructor.
          */
         public function __construct()
         {
+            require 'Rapports.php';
+            $this->keyprod_tables = new Rapports(__FILE__);
+
+
             add_action( 'admin_menu', array($this,'add_menu' ));
             add_action( 'current_screen', array($this, 'init_page_scripts' ));
 
