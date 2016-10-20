@@ -49,7 +49,7 @@ if(!class_exists('Keyprod')) {
                 echo '<div class="wrap">';
                     echo '<h1>Welcom to Keyprod options</h1>';
                     echo '<div id="keyprod-app">';
-                        echo "<div v-if='hasHistoric' class='list-group'><a href='#' class='list-group-item list-group-item-action' style='margin-top:20px;' v-for='historic in hasHistoric' @click='displayHistoric(historic.id)'>Rapport du <b>{{ historic.date }}</b> <span class=\"tag tag-default tag-pill pull-xs-right\">{{historic.rapports.length}}</span></a></div>";
+                        echo "<div v-if='hasHistoric' class='list-group'><a href='#' class='list-group-item list-group-item-action' style='margin-top:20px;' v-for='historic in hasHistoric' @click='displayHistoric(historic)'>Rapport du <b>{{ historic.date }}</b> <span class=\"tag tag-default tag-pill pull-xs-right\" style='background: red;margin-left: 10px;'>{{historic.errors}}</span><span class=\"tag tag-default tag-pill pull-xs-right\" style='background: orange;margin-left: 10px;'>{{historic.warnings}}</span><span class=\"tag tag-default tag-pill pull-xs-right\" style='background: greenyellow;margin-left: 10px;'>{{historic.success}}</span></a></div>";
                         echo "<fake-loader v-if='loading'></fake-loader>";
                         echo '<checking-array v-if="displayChecking" :rapports="rapports" :trello="trello" style="margin-top: 20px;"></checking-array>';
                         echo '<p v-if="!launch">Here you can start your monitoring</p>';
@@ -105,7 +105,7 @@ if(!class_exists('Keyprod')) {
                 for ($i = 0; $i < count($rapports); $i++){
                     array_push(  $datas, [
                         "id" => $rapports[$i]->id,
-                        "date" => date("j / n / Y", strtotime($rapports[$i]->time)),
+                        "date" => date("j / n / Y à H:i:s", strtotime($rapports[$i]->time)),
                         "rapports" => json_decode($rapports[$i]->rapport)
                     ]);
                 }

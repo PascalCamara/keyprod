@@ -71,7 +71,7 @@ $(document).ready(function() {
             'displayChecking' : false,
             'action' : false,
             'rapports' : {},
-            'trello' : false
+            'trello' : true
         },
         methods : {
             start: function () {
@@ -88,6 +88,7 @@ $(document).ready(function() {
                     self.rapports = JSON.parse(response);
                     self.displayChecking = true;
                     console.log(self.rapports);
+                    self.action = "start";
 
                 });
             },
@@ -103,21 +104,45 @@ $(document).ready(function() {
 
                 $.post(keyprod_ajax_url.ajax_url, data, function (response) {
                     self.loading = false;
-                    self.hasHistoric= JSON.parse(response);
-                    console.log(self.hasHistoric);
+                    var historics = JSON.parse(response);
+
+                    for (var i = 0; i < historics.length; i++) {
+                        // historics[i].rapports.id = historic.id;
+
+                        historics[i].errors = 0;
+                        historics[i].success = 0;
+                        historics[i].warnings = 0;
+
+                        for (var y = 0; y < historics[y].rapports.length; y++) {
+                            if  (historics[i].rapports[y].state == 1)
+                                historics[i].success++;
+                            else if  (historics[i].rapports[y].state == 2)
+                                historics[i].warnings++;
+                            else
+                                historics[i].errors++;
+                        }
+                    }
+
+                    console.log("hasHisto", historics);
+
+                    self.hasHistoric = historics;
                 });
 
             },
-            displayHistoric : function (id_historic) {
+            displayHistoric : function (historic) {
                 var self = this;
+                console.log('historic', historic);
                 self.action = "displayHistoric";
-                self.rapports = self.hasHistoric[parseInt(id_historic, 10)].rapports;
+
+                self.rapports = historic.rapports;
                 self.hasHistoric = false;
                 self.displayChecking = true;
+
+                console.log(self.rapports);
             },
             backTo : function() {
                 var self = this;
-                self.action =false;
+                self.action = false;
                 self.launch = false;
                 self.loading = false;
                 self.hasHistoric = false;
