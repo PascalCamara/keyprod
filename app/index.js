@@ -1,4 +1,22 @@
 var $ = jQuery;
+console.log(trello_token);
+var trello_token = typeof (trello_token) === "string" ? trello_token : false;
+
+
+var authenticationSuccess = function() { console.log("Trello Success"); };
+var authenticationFailure = function() { console.log("Trello Fail"); };
+if (trello_token) {
+    Trello.authorize({
+        type: 'popup',
+        name: 'Getting Started Application',
+        scope: {
+            read: 'true',
+            write: 'true' },
+        expiration: 'never',
+        success: authenticationSuccess,
+        error: authenticationFailure
+    });
+}
 
 $(document).ready(function() {
 
@@ -71,7 +89,9 @@ $(document).ready(function() {
             'displayChecking' : false,
             'action' : false,
             'rapports' : {},
-            'trello' : true
+            'trello' : trello_token,
+            'displayConfigTrello' : false,
+            'model_token' : null
         },
         methods : {
             start: function () {
@@ -105,15 +125,13 @@ $(document).ready(function() {
                 $.post(keyprod_ajax_url.ajax_url, data, function (response) {
                     self.loading = false;
                     var historics = JSON.parse(response);
-
+                    console.log('historics', historics);
                     for (var i = 0; i < historics.length; i++) {
-                        // historics[i].rapports.id = historic.id;
-
+                        console.log('i', i);
                         historics[i].errors = 0;
                         historics[i].success = 0;
                         historics[i].warnings = 0;
-
-                        for (var y = 0; y < historics[y].rapports.length; y++) {
+                        for (var y = 0; y < historics[i].rapports.length; y++) {
                             if  (historics[i].rapports[y].state == 1)
                                 historics[i].success++;
                             else if  (historics[i].rapports[y].state == 2)
@@ -140,6 +158,15 @@ $(document).ready(function() {
 
                 console.log(self.rapports);
             },
+            configTrello: function () {
+                var self = this;
+                self.action = "config_trello";
+                self.launch = true;
+                self.loading = false;
+                self.hasHistoric = false;
+                self.displayChecking = false;
+                self.displayConfigTrello = true;
+            },
             backTo : function() {
                 var self = this;
                 self.action = false;
@@ -147,6 +174,21 @@ $(document).ready(function() {
                 self.loading = false;
                 self.hasHistoric = false;
                 self.displayChecking = false;
+                self.displayConfigTrello = false;
+            },
+            validationToken : function() {
+                console.log("in click", this.model_token);
+                self.loading = true;
+                $.post(keyprod_ajax_url.ajax_url, { action : "ajax_set_trello_token", token : this.model_token }, function (response) {
+                    self.loading = false;
+                    if (JSON.parse(response) == "error") {
+                        alert("erreur");
+                    } else {
+                        window.location.href = "?page=keyprod_page_options";
+                    }
+
+                });
+
             }
         }
     });
