@@ -6,7 +6,7 @@ var trello_token = typeof (trello_token) === "string" ? trello_token : false;
 var authenticationSuccess = function() { console.log("Trello Success"); };
 var authenticationFailure = function() { console.log("Trello Fail"); };
 if (trello_token) {
-    Trello.authorize({
+    const apiTrello = Trello.authorize({
         type: 'popup',
         name: 'Getting Started Application',
         scope: {
@@ -33,7 +33,10 @@ $(document).ready(function() {
     };
 
     var checkingArray = {
-        props : ['rapports', 'trello'],
+        props : {
+            rapports: {type: Array},
+            trello: {}
+        },
         data : function() {
             return {
                 stateClass : {
@@ -49,10 +52,24 @@ $(document).ready(function() {
                         'css' : 'bg-danger',
                         'text' : 'Danger'
                     }
-                }
+                },
+                trelloInterface : false,
+                assigned : {},
+                trelloTables : false,
+                trelloTableChosen : false,
+                trelloLists : false,
+                trelloListChosen : false,
+                trelloMembers : false,
+                trelloMemberChosen : false,
+                successAssign : false
+
             }
         },
-        template : '<table class="table table-sm table-inverse">'
+        template : '<div>'
+        +'<div v-if="successAssign" class="alert alert-success" role="alert">'
+            +'<strong>Well done!</strong> You successfully assign the rapport'
+        +'</div>'
+        +'<table class="table table-sm table-inverse">'
         +'<thead>'
             +'<tr>'
                 +'<th>#</th>'
@@ -67,13 +84,108 @@ $(document).ready(function() {
                 +'<td>{{ stateClass[rapport.state].text }}</td>'
                 +'<td><span v-for="desc in rapport.description" style="display: block;">{{ desc }}</span></td>'
                 + '<td v-if="trello">'
-                    +'<div class="checkbox" v-if="rapport.state != 1">'
-                    +'<input type="checkbox" value="">'
+                    +'<div class="checkbox"  v-if="rapport.state != 1">'
+                    +'<input type="checkbox" v-on:click="_assignRapport(rapport)" value="">'
                     +'</div>'
                 +'</td>'
             +'</tr>'
-        +'</tbody>'
-        +'</table>'
+        +'</tbody></table>'
+            +'<div v-if="trelloInterface"><div class="row">'
+                +'<div class="col-sm-12"><div class="card" style="margin: auto;margin-bottom: 5px!important;">'
+                    +'<ul class="list-group list-group-flush">'
+                        +'<li v-for="assi in assigned" class="list-group-item">Rapport # {{ assi.id}}</li>'
+                    +'</ul>'
+                +'</div></div>'
+                +'<div v-if="trelloTables" class="col-sm-12"><div class="card" style="margin: auto;margin-bottom: 5px!important;"><p>Choose a Table</p>'
+                    +'<div class="list-group">'
+                        +'<a href="" v-for="trelloTable in trelloTables" class="list-group-item list-group-item-action" v-on:click.prevent="_trelloChooseTable(trelloTable)">{{ trelloTable.name }}</a>'
+                    +'</div>'
+                +'</div></div>'
+                +'<div v-if="trelloLists" class="col-sm-12"><div class="card" style="margin: auto;margin-bottom: 5px!important;"><p>Choose a List</p>'
+                    +'<div class="list-group">'
+                        +'<p v-if="trelloLists.length == 0">Create your own list in your account</p>'
+                        +'<a href="" v-for="trelloList in trelloLists" class="list-group-item list-group-item-action" v-on:click.prevent="_trelloChooseList(trelloList)">{{ trelloList.name }}</a>'
+                    +'</div>'
+                +'</div></div>'
+                +'<div v-if="trelloMembers" class="col-sm-12"><div class="card" style="margin: auto;margin-bottom: 5px!important;"><p>Choose a Member</p>'
+                    +'<div class="list-group">'
+                        +'<a href="" v-for="trelloMember in trelloMembers" class="list-group-item list-group-item-action" v-on:click.prevent="_trelloChooseMember(trelloMember)">{{ trelloMember.fullName }}</a>'
+                    +'</div>'
+                +'</div></div><div class="col-sm-12" style="text-align: center;"><button v-on:click="_assignTo" v-if="trelloMemberChosen" type="button" class="btn btn-outline-primary" style="margin-left: 20px">Assign to</button></div>'
+            +'</div></div></div>'
+        +'</div>',
+        methods: {
+            _assignRapport : function (rapport) {
+                var self = this;
+                self.trelloInterface = false;
+                console.log("click 2",rapport);
+                if (self.assigned[rapport.id] === undefined) {
+                    self.assigned[rapport.id] = rapport;
+                } else {
+                    delete self.assigned[rapport.id];
+                }
+                console.log(self.assigned);
+                if (self.trelloTables === false)
+                    Trello.get('/members/me/boards/', function (tables) {
+                        console.log('tables', tables);
+                        self.trelloTables = tables;
+                    }, function () { alert('fail')});
+                self.trelloInterface = true;
+                console.log(self.trelloTables);
+            },
+            _trelloChooseTable : function (table) {
+                var self = this;
+                this.trelloLists = false;
+                this.trelloMembers = false;
+                this.trelloMemberChosen =false;
+                console.log(this.trelloTableChosen = table);
+                console.log('table', table);
+               Trello.get('boards/'+table.id+'/lists', function (lists) {
+                    console.log('lists', self.trelloLists = lists);
+                }, function () { alert('fail')});
+            },
+            _trelloChooseList : function (list) {
+                var self = this;
+                this.trelloMembers = false;
+                this.trelloMemberChosen =false;
+                console.log(this.trelloListChosen = list);
+                console.log('list', list);
+                Trello.get('/boards/'+list.idBoard+'/members/', function (members) {
+                    console.log('member', self.trelloMembers = members);
+                }, function () { alert('fail')});
+            },
+            _trelloChooseMember : function (member) {
+                var self = this;
+                console.log(self.trelloMemberChosen = member);
+            },
+            _assignTo : function () {
+                var self = this;
+
+                if (self.assigned != false && self.trelloTableChosen != false && self.trelloListChosen != false && self.trelloMemberChosen != false) {
+                    console.log('assigned', self.assigned);
+                    var desc = "Keyprod assignment, ";
+                    for (var a in self.assigned)
+                        desc += 'rapport : #' + self.assigned[a].id + ' "'+self.assigned[a].description.join() +'"';
+                    console.log('self.trelloMemberChosen.id', self.trelloMemberChosen.id);
+                    Trello.post('/cards/', {
+                        name : "Keyprod rapport (Wordpress)",
+                        desc : desc,
+                        idList : self.trelloListChosen.id,
+                        idMembers : [ self.trelloMemberChosen.id ]
+                    }, function (responses) {
+                        var self = this;
+                        if (responses){
+                            console.log('in the if');
+                            self.trelloInterface = false;
+                            self.successAssign = true;
+                        }
+
+                    })
+                }
+
+            }
+
+        }
     };
 
     var keyprodApp = new Vue({
