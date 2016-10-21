@@ -1,5 +1,4 @@
 var $ = jQuery;
-console.log(trello_token);
 var trello_token = typeof (trello_token) === "string" ? trello_token : false;
 
 
@@ -118,55 +117,47 @@ $(document).ready(function() {
             _assignRapport : function (rapport) {
                 var self = this;
                 self.trelloInterface = false;
-                console.log("click 2",rapport);
                 if (self.assigned[rapport.id] === undefined) {
                     self.assigned[rapport.id] = rapport;
                 } else {
                     delete self.assigned[rapport.id];
                 }
-                console.log(self.assigned);
                 if (self.trelloTables === false)
                     Trello.get('/members/me/boards/', function (tables) {
-                        console.log('tables', tables);
                         self.trelloTables = tables;
                     }, function () { alert('fail')});
                 self.trelloInterface = true;
-                console.log(self.trelloTables);
             },
             _trelloChooseTable : function (table) {
                 var self = this;
                 this.trelloLists = false;
                 this.trelloMembers = false;
                 this.trelloMemberChosen =false;
-                console.log(this.trelloTableChosen = table);
-                console.log('table', table);
+                this.trelloTableChosen = table;
                Trello.get('boards/'+table.id+'/lists', function (lists) {
-                    console.log('lists', self.trelloLists = lists);
+                    self.trelloLists = lists;
                 }, function () { alert('fail')});
             },
             _trelloChooseList : function (list) {
                 var self = this;
                 this.trelloMembers = false;
                 this.trelloMemberChosen =false;
-                console.log(this.trelloListChosen = list);
-                console.log('list', list);
+                this.trelloListChosen = list;
                 Trello.get('/boards/'+list.idBoard+'/members/', function (members) {
-                    console.log('member', self.trelloMembers = members);
+                    self.trelloMembers = members;
                 }, function () { alert('fail')});
             },
             _trelloChooseMember : function (member) {
                 var self = this;
-                console.log(self.trelloMemberChosen = member);
+                self.trelloMemberChosen = member;
             },
             _assignTo : function () {
                 var self = this;
 
                 if (self.assigned != false && self.trelloTableChosen != false && self.trelloListChosen != false && self.trelloMemberChosen != false) {
-                    console.log('assigned', self.assigned);
                     var desc = "Keyprod assignment, ";
                     for (var a in self.assigned)
                         desc += 'rapport : #' + self.assigned[a].id + ' "'+self.assigned[a].description.join() +'"';
-                    console.log('self.trelloMemberChosen.id', self.trelloMemberChosen.id);
                     Trello.post('/cards/', {
                         name : "Keyprod rapport (Wordpress)",
                         desc : desc,
@@ -174,7 +165,6 @@ $(document).ready(function() {
                         idMembers : [ self.trelloMemberChosen.id ]
                     }, function (responses) {
                         if (responses){
-                            console.log('in the if');
                             self.trelloInterface = false;
                             self.successAssign = true;
                         }
@@ -187,7 +177,6 @@ $(document).ready(function() {
                 //var data = [["name1", "city1", "some other info"], ["name2", "city2", "more info"]];
                 var array = [['id', 'state' , 'description']];
                 for (var ar = 0; ar < this.rapports.length; ar++) {
-                    console.log(this.rapports[ar]);
                     array.push([
                         this.rapports[ar].id,
                         this.rapports[ar].state === 1? 'success' : this.rapports[ar].state === 2 ? "warning" : "danger",
@@ -196,7 +185,6 @@ $(document).ready(function() {
                 }
 
                 var data = array;
-                console.log("data", data);
                 var csvContent = "data:text/csv;charset=utf-8,\uFEFF";
                 data.forEach(function(infoArray, index){
                     dataString = infoArray.join(";");
@@ -241,7 +229,6 @@ $(document).ready(function() {
                     self.loading = false;
                     self.rapports = JSON.parse(response);
                     self.displayChecking = true;
-                    console.log(self.rapports);
                     self.action = "start";
 
                 });
@@ -259,9 +246,7 @@ $(document).ready(function() {
                 $.post(keyprod_ajax_url.ajax_url, data, function (response) {
                     self.loading = false;
                     var historics = JSON.parse(response);
-                    console.log('historics', historics);
                     for (var i = 0; i < historics.length; i++) {
-                        console.log('i', i);
                         historics[i].errors = 0;
                         historics[i].success = 0;
                         historics[i].warnings = 0;
@@ -275,22 +260,18 @@ $(document).ready(function() {
                         }
                     }
 
-                    console.log("hasHisto", historics);
-
                     self.hasHistoric = historics;
                 });
 
             },
             displayHistoric : function (historic) {
                 var self = this;
-                console.log('historic', historic);
                 self.action = "displayHistoric";
 
                 self.rapports = historic.rapports;
                 self.hasHistoric = false;
                 self.displayChecking = true;
 
-                console.log(self.rapports);
             },
             configTrello: function () {
                 var self = this;
@@ -311,7 +292,6 @@ $(document).ready(function() {
                 self.displayConfigTrello = false;
             },
             validationToken : function() {
-                console.log("in click", this.model_token);
                 self.loading = true;
                 $.post(keyprod_ajax_url.ajax_url, { action : "ajax_set_trello_token", token : this.model_token }, function (response) {
                     self.loading = false;
