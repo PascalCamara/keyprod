@@ -89,7 +89,7 @@ $(document).ready(function() {
                     +'</div>'
                 +'</td>'
             +'</tr>'
-        +'</tbody></table>'
+        +'</tbody></table><div class="row"><div class="col-sm-12"><button v-on:click="_exportToCsv" type="button" class="btn btn-outline-success" style="margin-left: 20px;margin-bottom: 20px;">Export CSV</button></div></div>'
             +'<div v-if="trelloInterface"><div class="row"><div class="col-sm-6"><div class="row">'
                 +'<div class="col-sm-12"><div class="card" style="margin: auto;margin-bottom: 5px!important;">'
                     +'<ul class="list-group list-group-flush">'
@@ -181,6 +181,29 @@ $(document).ready(function() {
 
                     })
                 }
+
+            },
+            _exportToCsv : function () {
+                //var data = [["name1", "city1", "some other info"], ["name2", "city2", "more info"]];
+                var array = [['id', 'state' , 'description']];
+                for (var ar = 0; ar < this.rapports.length; ar++) {
+                    console.log(this.rapports[ar]);
+                    array.push([
+                        this.rapports[ar].id,
+                        this.rapports[ar].state === 1? 'success' : this.rapports[ar].state === 2 ? "warning" : "danger",
+                        this.rapports[ar].description.join()
+                    ]);
+                }
+
+                var data = array;
+                console.log("data", data);
+                var csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+                data.forEach(function(infoArray, index){
+                    dataString = infoArray.join(";");
+                    csvContent += index < data.length ? dataString+ "\n" : dataString;
+                });
+                var encodedUri = encodeURI(csvContent);
+                window.open(encodedUri);
 
             }
 
