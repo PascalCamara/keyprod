@@ -90,7 +90,7 @@ $(document).ready(function() {
                 +'</td>'
             +'</tr>'
         +'</tbody></table>'
-            +'<div v-if="trelloInterface"><div class="row">'
+            +'<div v-if="trelloInterface"><div class="row"><div class="col-sm-6"><div class="row">'
                 +'<div class="col-sm-12"><div class="card" style="margin: auto;margin-bottom: 5px!important;">'
                     +'<ul class="list-group list-group-flush">'
                         +'<li v-for="assi in assigned" class="list-group-item">Rapport # {{ assi.id}}</li>'
@@ -111,8 +111,8 @@ $(document).ready(function() {
                     +'<div class="list-group">'
                         +'<a href="" v-for="trelloMember in trelloMembers" class="list-group-item list-group-item-action" v-on:click.prevent="_trelloChooseMember(trelloMember)">{{ trelloMember.fullName }}</a>'
                     +'</div>'
-                +'</div></div><div class="col-sm-12" style="text-align: center;"><button v-on:click="_assignTo" v-if="trelloMemberChosen" type="button" class="btn btn-outline-primary" style="margin-left: 20px">Assign to</button></div>'
-            +'</div></div></div>'
+                +'</div></div>'
+            +'</div></div><div class="col-sm-6"><div class="col-sm-12"><div class="card" v-if="assigned" style="margin: auto;margin-bottom: 5px!important;background: rgba(0, 0, 0, 0.2);"><p v-if="trelloTableChosen">Board : {{ trelloTableChosen.name }} </p><p v-if="trelloListChosen">List : {{ trelloListChosen.name}}</p><p v-if="trelloMemberChosen">To {{trelloMemberChosen.fullName}}</p><p class="trello_corp" >Keyprod wordpress : <span v-for="assign in assigned">Rapport #{{ assign.id }}<span v-for="desc in assign.description">{{ desc }}</span></p></div><div class="col-sm-12" style="text-align: center;"><button v-on:click="_assignTo" v-if="trelloMemberChosen" type="button" class="btn btn-outline-primary" style="margin-left: 20px">Assign to</button></div></div></div></div>'
         +'</div>',
         methods: {
             _assignRapport : function (rapport) {
@@ -173,7 +173,6 @@ $(document).ready(function() {
                         idList : self.trelloListChosen.id,
                         idMembers : [ self.trelloMemberChosen.id ]
                     }, function (responses) {
-                        var self = this;
                         if (responses){
                             console.log('in the if');
                             self.trelloInterface = false;
